@@ -3,6 +3,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { LoginDialog } from './LoginDialog';
 import { useAuth } from '@/app/context/AuthContext';
+import { auth } from '@/app/firebase/config';
+import { toast } from 'sonner';
 
 
 export default function Header() {
@@ -10,6 +12,9 @@ export default function Header() {
     const [language, setLanguage] = useState('English');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { user } = useAuth();
+    
+    // Debug log to check user state
+    console.log('Current user state:', user);
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -107,9 +112,15 @@ export default function Header() {
                             </Link>
                             {user ? (
                                 <div className="flex items-center space-x-4">
-                                    <span className="text-gray-700">Welcome, {user.phoneNumber}</span>
+                                    <span className="text-gray-700">{user.email || user.phoneNumber}</span>
                                     <button
-                                        onClick={() => auth.signOut()}
+                                        onClick={() => {
+                                            auth.signOut();
+                                            toast.success('Logged out successfully!', {
+                                                position: 'bottom-right',
+                                                duration: 3000
+                                            });
+                                        }}
                                         className="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-md hover:bg-gray-50 transition-colors"
                                     >
                                         Logout

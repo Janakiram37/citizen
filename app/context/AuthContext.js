@@ -10,21 +10,39 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // Set user state
         setUser({
           uid: user.uid,
           phoneNumber: user.phoneNumber,
           email: user.email
-        })
-      } else {
-        setUser(null)
-      }
-      setLoading(false)
-    })
+        });
 
-    return () => unsubscribe()
-  }, [])
+        // Get and store the auth token
+        try {
+          const token = await user.getIdToken();
+          // Store token in cookie using fetch API
+          await fetch('/api/auth/cookie', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token }),
+          });
+        } catch (error) {
+          console.error('Error setting auth token:', error);
+        }
+      } else {
+        setUser(null);
+        // Clear the auth token cookie
+        await fetch('/api/auth/cookie', { method: 'DELETE' });
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading }}>
