@@ -288,7 +288,7 @@ export function LoginDialog() {
             className="flex items-center gap-2"
             onClick={() => setShowDropdown(!showDropdown)}
           >
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="h-8 w-8 flex items-center justify-center">
               {user.email ? user.email[0].toUpperCase() : user.phoneNumber?.slice(-2)}
             </div>
             <span className="font-medium">
